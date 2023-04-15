@@ -35,32 +35,20 @@ SBOX_INVERSE = {
     0xE: 0x9,
     0xF: 0xA
 }
+pTable = [0, 16, 32, 48, 1, 17, 33, 49, 2, 18, 34, 50, 3, 19, 35, 51, 4, 20, 36, 52, 5, 21, 37, 53, 6, 22, 38, 54, 7, 23, 39, 55, 8, 24, 40, 56, 9, 25, 41, 57, 10, 26, 42, 58, 11, 27, 43, 59, 12, 28, 44, 60, 13, 29, 45, 61, 14, 30, 46, 62, 15, 31, 47, 63]
 
-
-def string_to_bits(s):
-    bits = []
-    for c in s:
-        bits.extend([int(b) for b in bin(ord(c))[2:].zfill(8)])
-    return bits
-
-def pLayer(state):
-    # permutation table
-    pTable = [
-        0, 16, 32, 48, 1, 17, 33, 49, 2, 18, 34, 50, 3, 19, 35, 51,
-        4, 20, 36, 52, 5, 21, 37, 53, 6, 22, 38, 54, 7, 23, 39, 55,
-        8, 24, 40, 56, 9, 25, 41, 57, 10, 26, 42, 58, 11, 27, 43, 59,
-        12, 28, 44, 60, 13, 29, 45, 61, 14, 30, 46, 62, 15, 31, 47, 63
-    ]
-    # convert input state to a list of bits
-    state_bits = string_to_bits(state)
-    # initialize output state as a list of zeros
-    out_state_bits = ['0'] * 64
-    # apply permutation table to input state
-    for i in range(64):
-        out_state_bits[i] = state_bits[63 - pTable[i]]
-    # convert output state to a binary string
-    out_state = ''.join(out_state_bits)
-    return out_state
+def pLayer(state, pTable):
+    # Convert the state to binary
+    state_binary = bin(int(state, 16))[2:].zfill(64)
+    # Define output as this cannot be defined during execute
+    p_layer_output = ""
+    # Loop through the permutation table and apply it to the state
+    for i in pTable:
+        p_layer_output += state_binary[i]
+    # Convert back to hex
+    p_layer_state = hex(int(p_layer_output, 2))
+    # Return the permuted state
+    return p_layer_state
 
 def sBoxLayer(state, SBOX):
     #convert to binary
@@ -125,14 +113,11 @@ print("C1: " + C1)
 #C2 is C1 which utilizes SBOX
 C2 = sBoxLayer(C1, SBOX)
 print("C2: " + C2)
-C3 = pLayer(C2)
-print("C3: " + C3)
-
+C3 = pLayer(C2, pTable)
 
 #testing decryption
-D1 = pLayer(C3)
-D2 = sBoxDecrypt(D1, SBOX_INVERSE)
+D1 = pLayer(C3, pTable)
+D2 = sBoxDecrypt(C2, SBOX_INVERSE)
 D3 = addRoundKey(D2, k)
-
 if D3 == plaintext:
     print("Decryption Success!")
