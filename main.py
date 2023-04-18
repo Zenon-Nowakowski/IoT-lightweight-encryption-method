@@ -121,3 +121,40 @@ D2 = sBoxDecrypt(C2, SBOX_INVERSE)
 D3 = addRoundKey(D2, k)
 if D3 == plaintext:
     print("Decryption Success!")
+
+#PART 2
+p = 47
+q = 71
+n = p * q
+phi_n = (p - 1) * (q - 1)
+e = 97
+d = 1693 
+
+plaintext = '0x012324B10AFBECDD' #0x012324B10AFBECDD
+plaintext_numbers = []
+for char in plaintext[2:]:
+    num = int(char, 16)
+    plaintext_numbers.append(num)
+
+def encrypt(m, e, n):
+    return pow(m, e, n)
+
+def decrypt(c, d, n):
+    return pow(c, d, n)
+
+ciphertext_numbers = []
+for m in plaintext_numbers:
+    c = encrypt(m, e, n)
+    ciphertext_numbers.append(c)
+
+print("Ciphertext:", ciphertext_numbers)
+
+decrypted_numbers = []
+for c in ciphertext_numbers:
+    m = decrypt(c, d, n)
+    decrypted_numbers.append(m)
+
+decrypted_hex = '0x' + ''.join([hex(num)[2:].upper() for num in decrypted_numbers])
+
+# Print the decrypted plaintext
+print("Decrypted plaintext:", decrypted_hex)
